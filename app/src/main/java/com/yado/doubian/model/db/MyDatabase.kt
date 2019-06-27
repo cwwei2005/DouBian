@@ -6,12 +6,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.yado.doubian.App
 
-@Database(entities = [Repo::class], version = 1)
+@Database(entities = [Repo::class, ZhihuNews::class], version = 1)
 abstract class MyDatabase : RoomDatabase(){
     companion object {
         @Volatile private var intence: MyDatabase? = null
 
-        fun getInstance(ctx: Context): MyDatabase{
+        fun getInstance(): MyDatabase{
             if (intence == null){
                 synchronized(MyDatabase::class.java){
                     if (intence == null){
@@ -24,4 +24,5 @@ abstract class MyDatabase : RoomDatabase(){
     }
 
     abstract fun repoDao(): RepoDao
+    abstract fun newsDao(): ZhihuNewsDao
 }

@@ -10,21 +10,21 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import com.yado.doubian.R
 import com.yado.doubian.autoCleared
-import com.yado.doubian.databinding.FragmentMainBinding
-import com.yado.doubian.ui.adapter.RepoAdapter
-import com.yado.doubian.viewmodel.MoiveViewModel
-import kotlinx.android.synthetic.main.fragment_main.*
+import com.yado.doubian.databinding.FragmentNewsBinding
+import com.yado.doubian.ui.adapter.NewsAdapter
+import com.yado.doubian.vm.NewsViewModel
+import kotlinx.android.synthetic.main.fragment_news.*
 
-class MainFragment : Fragment() {
+class NewsFragment : Fragment() {
     private var inited = false
-    private var binding by autoCleared<FragmentMainBinding>()
-    private var adapter by autoCleared<RepoAdapter>()
-    private val moiveViewModel = MoiveViewModel()
+    private var binding by autoCleared<FragmentNewsBinding>()
+    private var adapter by autoCleared<NewsAdapter>()
+    private val vm = NewsViewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-//        return inflater.inflate(R.layout.fragment_main, container, false)
+//        return inflater.inflate(R.layout.fragment_news, container, false)
         if (!inited){
-            binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false)
+            binding = DataBindingUtil.inflate(inflater, R.layout.fragment_news, container, false)
         }
         return binding.root
     }
@@ -40,17 +40,17 @@ class MainFragment : Fragment() {
     }
 
     private fun initRecyclerView() {
-        adapter = RepoAdapter(){ pos, repo ->
+        adapter = NewsAdapter(){ pos, _ ->
             Log.e("tag", "pos = $pos")
         }
         recyclerView.adapter = adapter
+        binding.result = vm.result  //为了使用result的loading状态
     }
 
     private fun loadingData(){
-        binding.loading = true
-        moiveViewModel.loading.value = binding.loading
-        moiveViewModel.result.observe(viewLifecycleOwner, Observer {it ->
-            adapter.refresh(it.data)
+        vm.loading.value = true
+        vm.result.observe(viewLifecycleOwner, Observer {
+            adapter.refresh(it.data?.stories)
         })
     }
 }

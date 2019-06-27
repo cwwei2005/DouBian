@@ -55,7 +55,8 @@ public class MyRetrofit {
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .baseUrl("https://api.github.com/")
+                .addCallAdapterFactory(new LiveDataCallAdapterFactory())
+                .baseUrl("https://news-at.zhihu.com/api/4/news/")
                 .build();
     }
 

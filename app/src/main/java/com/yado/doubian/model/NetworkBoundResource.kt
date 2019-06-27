@@ -5,6 +5,13 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.yado.doubian.Resource
+import com.yado.doubian.model.net.ApiEmptyResponse
+import com.yado.doubian.model.net.ApiErrorResponse
+import com.yado.doubian.model.net.ApiResponse
+import com.yado.doubian.model.net.ApiSuccessResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * A generic class that can provide a resource backed by both the sqlite database and the network.
@@ -30,7 +37,7 @@ abstract class NetworkBoundResource<ResultType, RequestType>
                 fetchFromNetwork(dbSource)
             } else {
                 result.addSource(dbSource) { newData ->
-                    setValue(Resource.success(listOf(newData)))
+                    setValue(Resource.success(newData))
                 }
             }
         }
@@ -44,16 +51,18 @@ abstract class NetworkBoundResource<ResultType, RequestType>
     }
 
     private fun fetchFromNetwork(dbSource: LiveData<ResultType>) {
-//        val apiResponse = createCall()
+        val apiResponse = createCall()  //发起http请求
+
         // we re-attach dbSource as a new source, it will dispatch its latest value quickly
         result.addSource(dbSource) { newData ->
-            setValue(Resource.loading(listOf(newData)))
+            setValue(Resource.loading(newData))
         }
-//        result.addSource(apiResponse) { response ->
-//            result.removeSource(apiResponse)
-//            result.removeSource(dbSource)
-//            when (response) {
-//                is ApiSuccessResponse -> {
+
+        result.addSource(apiResponse) { response ->
+            result.removeSource(apiResponse)
+            result.removeSource(dbSource)
+            when (response) {
+                is ApiSuccessResponse -> {
 //                    appExecutors.diskIO().execute {
 //                        saveCallResult(processResponse(response))
 //                        appExecutors.mainThread().execute {
@@ -65,31 +74,46 @@ abstract class NetworkBoundResource<ResultType, RequestType>
 //                            }
 //                        }
 //                    }
-//                }
-//                is ApiEmptyResponse -> {
+                    //用协程代替线程池
+                    val job = GlobalScope.launch(Dispatchers.IO) {
+                        saveCallResult(processResponse(response))
+                        launch(Dispatchers.Main) {
+                            result.addSource(loadFromDb()) { newData ->
+                                setValue(Resource.success(newData))
+                            }
+                        }
+                    }
+                }
+                is ApiEmptyResponse -> {
 //                    appExecutors.mainThread().execute {
 //                        // reload from disk whatever we had
 //                        result.addSource(loadFromDb()) { newData ->
 //                            setValue(Resource.success(newData))
 //                        }
 //                    }
-//                }
-//                is ApiErrorResponse -> {
-//                    onFetchFailed()
-//                    result.addSource(dbSource) { newData ->
-//                        setValue(Resource.error(response.errorMessage, newData))
-//                    }
-//                }
-//            }
-//        }
+                    //用协程代替线程池
+                    val job2 = GlobalScope.launch(Dispatchers.Main) {
+                        result.addSource(loadFromDb()) { newData ->
+                            setValue(Resource.success(newData))
+                        }
+                    }
+                }
+                is ApiErrorResponse -> {
+                    onFetchFailed()
+                    result.addSource(dbSource) { newData ->
+                        setValue(Resource.error(response.errorMessage, newData))
+                    }
+                }
+            }
+        }
     }
 
     protected open fun onFetchFailed() {}
 
     fun asLiveData() = result as LiveData<Resource<ResultType>>
 
-//    @WorkerThread
-//    protected open fun processResponse(response: ApiSuccessResponse<RequestType>) = response.body
+    @WorkerThread
+    protected open fun processResponse(response: ApiSuccessResponse<RequestType>) = response.body
 
     @WorkerThread
     protected abstract fun saveCallResult(item: RequestType)
@@ -100,6 +124,6 @@ abstract class NetworkBoundResource<ResultType, RequestType>
     @MainThread
     protected abstract fun loadFromDb(): LiveData<ResultType>
 
-//    @MainThread
-//    protected abstract fun createCall(): LiveData<ApiResponse<RequestType>>
+    @MainThread
+    protected abstract fun createCall(): LiveData<ApiResponse<RequestType>>
 }
