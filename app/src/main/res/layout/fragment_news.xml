@@ -20,13 +20,16 @@
                  xmlns:app="http://schemas.android.com/apk/res-auto"
                  tools:context=".ui.fragemnt.NewsFragment">
 
-        <com.yado.doubian.ui.weiget.RecyclerViewX
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layoutManager="LinearLayoutManager"
-                tools:listitem="@layout/news_item"
-                android:id="@+id/recyclerView"
-                android:background="#ccc"/>
+        <com.yado.doubian.ui.weiget.ScrollLayout android:layout_width="match_parent"
+                                                 android:layout_height="match_parent">
+            <com.yado.doubian.ui.weiget.RecyclerViewX
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layoutManager="LinearLayoutManager"
+                    tools:listitem="@layout/news_item"
+                    android:id="@+id/recyclerView"
+                    android:background="#ccc"/>
+        </com.yado.doubian.ui.weiget.ScrollLayout>
 
         <ProgressBar
                 android:layout_gravity="center"
