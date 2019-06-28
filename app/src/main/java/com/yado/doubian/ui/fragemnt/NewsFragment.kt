@@ -43,7 +43,7 @@ class NewsFragment : Fragment() {
 
     private fun initRecyclerView() {
         adapter = NewsAdapter(){ pos, bean ->
-            Log.e("tag", "pos = $pos, ${bean.title}")
+//            Log.e("tag", "pos = $pos, ${bean.title}")
             val bundle = bundleOf("title" to bean.title)
             Navigation.findNavController(binding.root).navigate(R.id.action_mainFragment_to_detailFragment, bundle)
         }
@@ -52,7 +52,7 @@ class NewsFragment : Fragment() {
     }
 
     private fun loadingData(){
-        vm.loading.value = true
+        vm.loading.value = true  //触发vm.result进行一次赋值
         vm.result.observe(viewLifecycleOwner, Observer {
             adapter.refresh(it.data?.stories)
         })

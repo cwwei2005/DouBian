@@ -3,6 +3,7 @@ package com.yado.doubian
 /**
  * A generic class that holds a value with its loading status.
  * @param <T>
+ *     封装了数据、加载状态和错误信息
 </T> */
 data class Resource<out T>(val status: LoadStatus, val data: T?, val message: String?) {
     companion object {

@@ -5,12 +5,14 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import com.yado.doubian.Resource
 import com.yado.doubian.model.NetworkBoundResource
-import com.yado.doubian.model.RepoSearchResponse
 import com.yado.doubian.model.db.Repo
 import com.yado.doubian.model.db.MyDatabase
 import com.yado.doubian.model.db.ZhihuNews
 import com.yado.doubian.model.net.MyRetrofit
 
+/**
+ * 不同的数据类型应该使用不同的repository类
+ */
 class NewsRepository {
 
     fun load(): LiveData<Resource<ZhihuNews>>{

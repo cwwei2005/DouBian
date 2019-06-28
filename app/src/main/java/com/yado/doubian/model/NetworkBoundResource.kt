@@ -11,6 +11,7 @@ import com.yado.doubian.model.net.ApiResponse
 import com.yado.doubian.model.net.ApiSuccessResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 /**
@@ -26,6 +27,7 @@ abstract class NetworkBoundResource<ResultType, RequestType>
 @MainThread constructor(/*private val appExecutors: AppExecutors*/) {
 
     private val result = MediatorLiveData<Resource<ResultType>>()
+    private var job: Job? = null
 
     init {
         result.value = Resource.loading(null)
@@ -75,7 +77,7 @@ abstract class NetworkBoundResource<ResultType, RequestType>
 //                        }
 //                    }
                     //用协程代替线程池
-                    val job = GlobalScope.launch(Dispatchers.IO) {
+                    job = GlobalScope.launch(Dispatchers.IO) {
                         saveCallResult(processResponse(response))
                         launch(Dispatchers.Main) {
                             result.addSource(loadFromDb()) { newData ->
@@ -92,7 +94,7 @@ abstract class NetworkBoundResource<ResultType, RequestType>
 //                        }
 //                    }
                     //用协程代替线程池
-                    val job2 = GlobalScope.launch(Dispatchers.Main) {
+                    job = GlobalScope.launch(Dispatchers.Main) {
                         result.addSource(loadFromDb()) { newData ->
                             setValue(Resource.success(newData))
                         }
@@ -108,7 +110,9 @@ abstract class NetworkBoundResource<ResultType, RequestType>
         }
     }
 
-    protected open fun onFetchFailed() {}
+    protected open fun onFetchFailed() {
+        job?.cancel()
+    }
 
     fun asLiveData() = result as LiveData<Resource<ResultType>>
 

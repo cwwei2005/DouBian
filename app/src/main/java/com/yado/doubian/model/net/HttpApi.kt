@@ -2,7 +2,6 @@ package com.yado.doubian.model.net
 
 
 import androidx.lifecycle.LiveData
-import com.yado.doubian.model.RepoSearchResponse
 import com.yado.doubian.model.db.ZhihuNews
 import io.reactivex.Flowable
 import retrofit2.http.GET

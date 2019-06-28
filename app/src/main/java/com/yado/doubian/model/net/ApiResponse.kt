@@ -7,6 +7,7 @@ import java.util.regex.Pattern
 /**
  * Common class used by API responses.
  * @param <T> the type of the response object
+ * 密封类：定义了api请求返回的ApiResponse只能是ApiEmptyResponse、ApiSuccessResponse、ApiErrorResponse三种
 </T> */
 @Suppress("unused") // T is used in extending classes
 sealed class ApiResponse<T> {
