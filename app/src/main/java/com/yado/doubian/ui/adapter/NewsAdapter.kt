@@ -10,11 +10,6 @@ import com.yado.doubian.databinding.MovieItemBinding
 import com.yado.doubian.model.db.Repo
 import com.yado.doubian.model.db.ZhihuNews
 
-class NewsAdapter(private val clickCallback: ((news: ZhihuNews, pos: Int) -> Unit)?) :
-    BaseBindingAdapter<ZhihuNews.StoriesBean>(R.layout.news_item, BR.story){
-
-    override fun itemClick(position: Int, t: ZhihuNews.StoriesBean) {
-        clickCallback
-    }
-
-}
+class NewsAdapter(private val clickCallback: ((pos: Int, storiesBean: ZhihuNews.StoriesBean) -> Unit)? =
+                      { _, _ -> }) :
+    BaseBindingAdapter<ZhihuNews.StoriesBean>(R.layout.news_item, BR.story, clickCallback)

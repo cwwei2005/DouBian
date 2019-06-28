@@ -6,8 +6,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.navigation.Navigation
 import com.yado.doubian.R
 import com.yado.doubian.autoCleared
 import com.yado.doubian.databinding.FragmentNewsBinding
@@ -40,8 +42,10 @@ class NewsFragment : Fragment() {
     }
 
     private fun initRecyclerView() {
-        adapter = NewsAdapter(){ pos, _ ->
-            Log.e("tag", "pos = $pos")
+        adapter = NewsAdapter(){ pos, bean ->
+            Log.e("tag", "pos = $pos, ${bean.title}")
+            val bundle = bundleOf("title" to bean.title)
+            Navigation.findNavController(binding.root).navigate(R.id.action_mainFragment_to_detailFragment, bundle)
         }
         recyclerView.adapter = adapter
         binding.result = vm.result  //为了使用result的loading状态

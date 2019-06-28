@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.yado.doubian.R
+import kotlinx.android.synthetic.main.fragment_detail.*
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -44,6 +45,11 @@ class DetailFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_detail, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        tv.text = arguments?.getCharSequence("title")
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -12,12 +12,15 @@ import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import android.text.method.TextKeyListener.clear
+import com.yado.doubian.model.db.ZhihuNews
 
 /**
- * a simple adapter for recyclerview, include item click, refresh
+ * a simple adapter for recyclerview, include item click, data refresh
  */
-open abstract class BaseBindingAdapter<T>(private val layoutId: Int, private val BRId: Int) :
-    RecyclerView.Adapter<BaseBindingAdapter.TheViewHolder>() {
+open abstract class BaseBindingAdapter<T>(
+    private val layoutId: Int,
+    private val BRId: Int,
+    private val clickCallback: ((pos: Int, t: T) -> Unit)?) : RecyclerView.Adapter<BaseBindingAdapter.TheViewHolder>() {
 
     private val mList: MutableList<T> by lazy { mutableListOf<T>() }
 
@@ -34,7 +37,9 @@ open abstract class BaseBindingAdapter<T>(private val layoutId: Int, private val
         holder.binding.executePendingBindings()
         //
         mList[position]?.let {
-            holder.itemView.setOnClickListener { itemClick(position, mList[position]) }
+            holder.itemView.setOnClickListener {
+                clickCallback?.invoke(position, mList[position])
+            }
         }
     }
 
@@ -52,7 +57,7 @@ open abstract class BaseBindingAdapter<T>(private val layoutId: Int, private val
         }
     }
 
-    abstract fun itemClick(position: Int, t: T)
+//    abstract fun itemClick(position: Int, t: T)
 
 
 
